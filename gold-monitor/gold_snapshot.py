@@ -12,7 +12,9 @@
 """
 import json
 import sys
+import base64
 import urllib.request
+import urllib.error
 import urllib.parse
 import datetime
 import os
@@ -115,7 +117,7 @@ FILLS = {"red": "#FCEBEB", "blue": "#E6F1FB", "green": "#EAF3DE"}
 def build_chart(last, outdir="charts"):
     os.makedirs(outdir, exist_ok=True)
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
-    fname = f"xau_{now.strftime('%Y%m%d_%H%M')}.svg"
+    fname = "xau_latest.svg"
     path = os.path.join(outdir, fname)
     items = DEC_BASE[:4] + [(f"{last:.0f} 现价", last, "purple", "dash")] + DEC_BASE[4:]
     parts = []
@@ -155,14 +157,53 @@ def pushplus(token, title, content):
         return r.read().decode("utf-8")
 
 
+# ---- 用 GitHub 当图床：上传 SVG，返回 raw 链接 ----
+def upload_chart_github(svg_path, gh_token, repo="0x75Nic/multi-asset-quant-toolkit", branch="master"):
+    api = f"https://api.github.com/repos/{repo}/contents"
+    fname = os.path.basename(svg_path)
+    remote_path = f"gold-monitor/charts/{fname}"
+    url = f"{api}/{remote_path}"
+    with open(svg_path, "rb") as f:
+        content = base64.b64encode(f.read()).decode()
+    # 若已存在则取 SHA 以便覆盖
+    sha = None
+    req = urllib.request.Request(url, headers={"Authorization": f"Bearer {gh_token}"})
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            sha = json.load(r).get("sha")
+    except urllib.error.HTTPError as e:
+        if e.code != 404:
+            raise
+    body = {"message": f"chore: update chart {fname}", "content": content}
+    if sha:
+        body["sha"] = sha
+    data = json.dumps(body).encode()
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers={"Authorization": f"Bearer {gh_token}", "Content-Type": "application/json"},
+        method="PUT",
+    )
+    with urllib.request.urlopen(req, timeout=20) as r:
+        json.load(r)
+    # 优先返回 GitHub Pages 链接（微信内可直接显示图），raw 作备用
+    return f"https://0x75nic.github.io/multi-asset-quant-toolkit/{remote_path}"
+
+
 if __name__ == "__main__":
     do_push = "--push" in sys.argv
     do_chart = "--chart" in sys.argv
+    do_upload = "--upload-chart" in sys.argv
     token = None
     if "--token" in sys.argv:
         token = sys.argv[sys.argv.index("--token") + 1]
     elif do_push:
         token = os.environ.get("PUSHPLUS_TOKEN")
+    gh_token = None
+    if "--gh-token" in sys.argv:
+        gh_token = sys.argv[sys.argv.index("--gh-token") + 1]
+    elif do_upload:
+        gh_token = os.environ.get("GITHUB_TOKEN")
     chart_dir = sys.argv[sys.argv.index("--chart-dir") + 1] if "--chart-dir" in sys.argv else "charts"
 
     t, cand, fr, oi = fetch()
@@ -180,9 +221,21 @@ if __name__ == "__main__":
             print("[!] extra-file 读取失败:", e, file=sys.stderr)
 
     chart_path = None
+    chart_url = None
     if do_chart:
         chart_path = build_chart(last, chart_dir)
         print("CHART_FILE=" + chart_path)
+        if do_upload:
+            if not gh_token:
+                print("\n[!] 未提供 GITHUB_TOKEN，跳过图上传", file=sys.stderr)
+            else:
+                chart_url = upload_chart_github(chart_path, gh_token)
+                print("CHART_URL=" + chart_url)
+                report += (
+                    f"\n\n## 方案阶梯图\n"
+                    f"![XAU 多空方案阶梯图]({chart_url})\n\n"
+                    f"> 如微信内未直接显示，可点击链接用浏览器打开"
+                )
 
     if "--chart-link" in sys.argv:
         link = sys.argv[sys.argv.index("--chart-link") + 1]
