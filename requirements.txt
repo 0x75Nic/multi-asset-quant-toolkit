@@ -1,0 +1,5 @@
+# 核心模块(加密/A股 突破扫描) 仅依赖标准库 urllib, 无需安装
+# 以下为可选增强:
+akshare>=1.13.0     # A股 现货行情/北向资金增强(核心K线不依赖)
+pandas>=2.0.0       # akshare 依赖
+# 美股模块依赖 TradingAgents-CN 框架(单独部署, 见 us_stocks/README.md)

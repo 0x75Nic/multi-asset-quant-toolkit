@@ -1,0 +1,6 @@
+venv/
+__pycache__/
+*.pyc
+*.log
+akshare_install*.log
+.env
