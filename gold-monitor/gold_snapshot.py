@@ -18,6 +18,10 @@ import urllib.error
 import urllib.parse
 import datetime
 import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import gold_signals
 
 INST = "XAU-USDT-SWAP"
 ZONE_LO = 4300.0
@@ -209,6 +213,19 @@ if __name__ == "__main__":
     t, cand, fr, oi = fetch()
     last = float(t["last"])
     report = build_report(t, cand, fr, oi)
+
+    # 宏观 + 持仓量化信号（Yahoo 宏观代理 + CFTC COT + FRED 真实利率）
+    try:
+        cd = os.path.dirname(os.path.abspath(__file__))
+        macro = gold_signals.fetch_macro()
+        cot = gold_signals.fetch_cot(cd)
+        # FRED 真实利率：--fred-key 传参可覆盖；默认走 gold_signals.FRED_API_KEY（内置免费 key）
+        fred = gold_signals.fetch_fred_dfii10(
+            sys.argv[sys.argv.index("--fred-key") + 1] if "--fred-key" in sys.argv else None
+        )
+        report += "\n\n---\n\n" + gold_signals.build_signal_block(macro, cot, fred)
+    except Exception as e:
+        print("[!] 宏观信号生成失败:", e, file=sys.stderr)
 
     if "--extra-file" in sys.argv:
         ef = sys.argv[sys.argv.index("--extra-file") + 1]

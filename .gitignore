@@ -4,3 +4,5 @@ __pycache__/
 *.log
 akshare_install*.log
 .env
+gold-monitor/cot_gold_cache.json
+gold-monitor/*.log
