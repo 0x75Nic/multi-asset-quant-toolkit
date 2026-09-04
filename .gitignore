@@ -4,5 +4,9 @@ __pycache__/
 *.log
 akshare_install*.log
 .env
+.workbuddy/
 gold-monitor/cot_gold_cache.json
 gold-monitor/*.log
+*_state.json
+*/charts/*.svg
+crypto_short/charts/*.svg
