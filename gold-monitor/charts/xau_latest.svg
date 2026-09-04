@@ -16,9 +16,9 @@
 <line x1="120" y1="188.3" x2="380" y2="188.3" stroke="#378ADD" stroke-width="2"/>
 <text x="90" y="192.3" font-size="13" text-anchor="end" fill="#378ADD">4440</text>
 <text x="390" y="192.3" font-size="13" fill="#2C2C2A">4440 空入场区（反弹至此空）</text>
-<line x1="120" y1="121.3" x2="380" y2="121.3" stroke="#7F77DD" stroke-width="1.5" stroke-dasharray="5,3"/>
-<text x="90" y="125.3" font-size="13" text-anchor="end" fill="#7F77DD">4484</text>
-<text x="390" y="125.3" font-size="13" fill="#2C2C2A">4484 现价</text>
+<line x1="120" y1="139.5" x2="380" y2="139.5" stroke="#7F77DD" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="90" y="143.5" font-size="13" text-anchor="end" fill="#7F77DD">4472</text>
+<text x="390" y="143.5" font-size="13" fill="#2C2C2A">4472 现价</text>
 <line x1="120" y1="361.9" x2="380" y2="361.9" stroke="#639922" stroke-width="2"/>
 <text x="90" y="365.9" font-size="13" text-anchor="end" fill="#639922">4325</text>
 <text x="390" y="365.9" font-size="13" fill="#2C2C2A">4325 多入场区（限价挂单）</text>
@@ -33,5 +33,5 @@
 <path d="M 300 361.9 L 300 236.6" stroke="#639922" stroke-width="2" fill="none" marker-end="url(#au)"/>
 <text x="340" y="294.0" font-size="12" fill="#378ADD">做空目标 4300</text>
 <text x="245" y="300.0" font-size="12" fill="#639922">多 TP1 4408</text>
-<text x="250" y="20" font-size="15" font-weight="500" fill="#2C2C2A" text-anchor="middle">XAU 多空方案阶梯（现价 4484 / 非农前）</text>
+<text x="250" y="20" font-size="15" font-weight="500" fill="#2C2C2A" text-anchor="middle">XAU 多空方案阶梯（现价 4472 / 非农前）</text>
 </svg>
